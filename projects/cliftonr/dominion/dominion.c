@@ -644,6 +644,7 @@ int getCost(int cardNumber)
 }
 
 //adventurer card function as called by cardEffect function switch
+//Error:  Changed state->handCount[currentPlayer]-- to ++ in else statement.  Changing gameplay
 int adventurerCard(int *drawntreasure, int *cardDrawn, struct gameState *state, int currentPlayer, int *temphand, int *z ) {
     while(*drawntreasure<2){
         if (state->deckCount[currentPlayer] <1){//if the deck is empty we need to shuffle discard and add to deck
@@ -655,7 +656,7 @@ int adventurerCard(int *drawntreasure, int *cardDrawn, struct gameState *state, 
             (*drawntreasure)++;
         else{
             temphand[*z]=*cardDrawn;
-            state->handCount[currentPlayer]--; //this should just remove the top card (the most recently drawn one).
+            state->handCount[currentPlayer]++; //this should just remove the top card (the most recently drawn one).
             (*z)++;
         }
     }
@@ -667,10 +668,11 @@ int adventurerCard(int *drawntreasure, int *cardDrawn, struct gameState *state, 
 }
 
 //smithy card function as called by cardEffect function switch
+//Error:  changing for loop from < 3  to <= 3, changing gameplay
 int smithyCard(int currentPlayer, struct gameState *state, int handPos) {
     int i;
     //+3 Cards
-    for (i = 0; i < 3; i++)
+    for (i = 0; i <= 3; i++)
     {
         drawCard(currentPlayer, state);
     }
@@ -681,6 +683,7 @@ int smithyCard(int currentPlayer, struct gameState *state, int handPos) {
 }
 
 //council room card function as called by cardEffect function switch
+//Error:  Changed if ( i != currentPlayer ) in second for loop to: if ( i == currentPlayer )
 int council_roomCard(int currentPlayer, struct gameState *state, int handPos) {
     int i;
     //+4 Cards
@@ -695,7 +698,7 @@ int council_roomCard(int currentPlayer, struct gameState *state, int handPos) {
     //Each other player draws a card
     for (i = 0; i < state->numPlayers; i++)
     {
-        if ( i != currentPlayer )
+        if ( i == currentPlayer )
         {
             drawCard(i, state);
         }
@@ -763,6 +766,7 @@ int feastCard (struct gameState *state, int currentPlayer, int *temphand, int ch
 }
 
 //mine card function as called by cardEffect function switch
+// commented out break statement in inner discard if loop.  
 int mineCard (struct gameState *state, int currentPlayer, int handPos, int choice1, int choice2) {
     int j,i;
     j = state->hand[currentPlayer][choice1];  //store card we will trash
@@ -793,7 +797,7 @@ int mineCard (struct gameState *state, int currentPlayer, int handPos, int choic
         if (state->hand[currentPlayer][i] == j)
         {
             discardCard(i, currentPlayer, state, 0);
-            break;
+            //break;
         }
     }
     
