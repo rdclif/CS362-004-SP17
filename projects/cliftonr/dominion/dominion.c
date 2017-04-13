@@ -703,7 +703,6 @@ int council_roomCard(int currentPlayer, struct gameState *state, int handPos) {
     
     //put played card in played card pile
     discardCard(handPos, currentPlayer, state, 0);
-    
     return 0;
 }
 
