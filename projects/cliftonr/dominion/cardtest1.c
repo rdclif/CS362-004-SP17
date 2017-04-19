@@ -31,7 +31,7 @@ int main() {
 
 
     printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n\n", testCard);
-    printf("\n->->  - TEST 1: Function Return  -  <-<-\n\n");
+    printf("\n----  - TEST 1: Function Return  -  ----\n\n");
     memcpy(&copyG, &G, sizeof(struct gameState));
     int retVal = cardEffect(smithy, choice1, choice2, choice3, &copyG, handPos, &bonus);
     printf("Return Value: %d, Expected: %d \n\n", retVal, 0);
@@ -39,7 +39,7 @@ int main() {
     assert(retVal == 0);
 
 
-    printf("\n->->  - TEST 2: Hand Count  -  <-<-\n\n");
+    printf("\n----  - TEST 2: Hand Count  -  ----\n\n");
     memcpy(&copyG, &G, sizeof(struct gameState));
 
     int addedCards = 3;
