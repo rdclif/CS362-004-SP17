@@ -1,0 +1,90 @@
+        -:    0:Source:unittest1.c
+        -:    0:Graph:unittest1.gcno
+        -:    0:Data:unittest1.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1://
+        -:    2:// Created by Robert Clifton on 4/18/17.
+        -:    3://unittest1  unit test for the handCard function.
+        -:    4://
+        -:    5://to make and test: make unittestresults.out
+        -:    6://
+        -:    7:
+        -:    8://gcc dominion.c rngs.c unittest1.c -o unittest1
+        -:    9:
+        -:   10:#include "dominion.h"
+        -:   11:#include "dominion_helpers.h"
+        -:   12:#include <string.h>
+        -:   13:#include <stdio.h>
+        -:   14:#include <assert.h>
+        -:   15:#include "rngs.h"
+        -:   16:#include <stdlib.h>
+        -:   17:
+        -:   18:int main() {
+        -:   19:
+        1:   20:    int pass = 1;
+        -:   21:    int i, z;
+        1:   22:    int x = 1000;
+        -:   23:    int retVal;
+        -:   24:
+        -:   25:
+        1:   26:    char testFunction[] = "handCard()";
+        -:   27:    struct gameState G, copyG;
+        1:   28:    int randSeed = 2;
+        1:   29:    int numbPlayers = 2;
+        -:   30:
+        1:   31:    int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
+        -:   32:                 sea_hag, tribute, smithy};
+        -:   33:
+        1:   34:    initializeGame(numbPlayers, k, randSeed, &G);
+        -:   35:
+        -:   36:
+        1:   37:    printf("\n->->->    - TESTING FUNCTION: %s -    <-<-<-\n\n", testFunction);
+        -:   38:
+        -:   39:    //basic test of return value
+        1:   40:    printf("\n----  - TEST 1: Return Value -  ----\n\n");
+        1:   41:    z = 0;
+     2002:   42:    for (i = 0; i < x; i++) {
+     1000:   43:        memcpy(&copyG, &G, sizeof(struct gameState));
+     1000:   44:        copyG.whoseTurn = 0;
+     1000:   45:        retVal = handCard(z, &copyG);
+     1000:   46:        if (retVal != G.hand[0][z]) {
+    #####:   47:            printf("TEST 1 Fail");
+    #####:   48:            pass = 0;
+    #####:   49:        }
+     1000:   50:        z++;
+     1000:   51:        if (z > copyG.handCount[0]) {
+      166:   52:            z = 0;
+      166:   53:        }
+     1000:   54:    }
+        1:   55:    printf("Return Value: %d, Expected: %d \n\n", retVal, 0);
+        -:   56:
+        -:   57:    //Test the card values after running function on copied struct
+        1:   58:    printf("\n----  - TEST 2: Test Values-  ----\n\n");
+        1:   59:    z = 0;
+     2002:   60:    for (i = 0; i < x; i++) {
+     1000:   61:        memcpy(&copyG, &G, sizeof(struct gameState));
+     1000:   62:        copyG.whoseTurn = 0;
+     1000:   63:        handCard(z, &copyG);
+     1000:   64:        z++;
+     1000:   65:        if (z > copyG.handCount[0]) {
+      166:   66:            z = 0;
+      166:   67:        }
+     1000:   68:    }
+        1:   69:    x = G.handCount[0];
+       12:   70:    for (i = 0; i < x; i++ ) {
+        5:   71:        printf("Card Val: %d, Expected: %d\n\n", copyG.hand[0][i], G.hand[0][i]);
+        5:   72:        if (copyG.hand[0][i]!= G.hand[0][i]) {
+    #####:   73:            pass = 0;
+    #####:   74:        }
+        5:   75:    }
+        -:   76:
+        -:   77:    //Final bool check to see if testing passed or failed,  prints result to standard out
+        1:   78:    if (pass) {
+        1:   79:        printf("->->  - TEST SUCCESSFULLY COMPLETED -  <-<-\n");
+        1:   80:    } else{
+    #####:   81:        printf("->->  - TEST FAILED -  <-<-\n");
+        -:   82:    }
+        -:   83:
+        1:   84:    return 0;
+        -:   85:};

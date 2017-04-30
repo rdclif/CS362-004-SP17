@@ -725,19 +725,25 @@ int feastCard (struct gameState *state, int currentPlayer, int *temphand, int ch
     x = 1;//Condition to loop on
     while( x == 1) {//Buy one card
         if (supplyCount(choice1, state) <= 0){
-            if (DEBUG)
-                printf("None of that card left, sorry!\n");
+            if (DEBUG) {
+              printf("None of that card left, sorry!\n");
+            }
             
             if (DEBUG){
                 printf("Cards Left: %d\n", supplyCount(choice1, state));
             }
+            //added to correct bug causing code to get stuck
+            x = 0;
         }
         else if (state->coins < getCost(choice1)){
-            printf("That card is too expensive!\n");
-            
+            if (DEBUG) {
+              printf("That card is too expensive!\n");
+            }
             if (DEBUG){
                 printf("Coins: %d < %d\n", state->coins, getCost(choice1));
             }
+            //added to correct bug causing code to get stuck
+            x = 0;
         }
         else{
             
@@ -753,8 +759,7 @@ int feastCard (struct gameState *state, int currentPlayer, int *temphand, int ch
             }
             
         }
-    }     
-    
+    }
     //Reset Hand
     for (i = 0; i <= state->handCount[currentPlayer]; i++){
         state->hand[currentPlayer][i] = temphand[i];

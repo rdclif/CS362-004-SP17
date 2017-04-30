@@ -1,7 +1,9 @@
 //
 // Created by Robert Clifton on 4/18/17.
+//cardtest3  unit test for the council_rooom card function.
 //
-
+//to make and test: make unittestresults.out
+//
 //gcc dominion.c rngs.c cardtest3.c -o cardtest3
 
 #include "dominion.h"
@@ -14,11 +16,13 @@
 
 int main() {
 
+    int pass = 1;
     char testCard[] = "council_room";
     struct gameState G, copyG;
     int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
                  sea_hag, tribute, smithy};
-    int i;
+    int j, i, retVal;
+    int x = 1000;
     int numbPlayers = 2;
     int randSeed = 10000000;
     int handPos = 0;
@@ -31,64 +35,90 @@ int main() {
 
 
     printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n\n", testCard);
+
+    //basic test of return value
     printf("\n----  - TEST 1: Function Return  -  ----\n\n");
-    memcpy(&copyG, &G, sizeof(struct gameState));
-    int retVal = cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
-
+    for (i = 0; i < x; i++) {
+        memcpy(&copyG, &G, sizeof(struct gameState));
+        retVal = cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
+        if (retVal != 0) {
+            pass = 0;
+            break;
+        };
+    };
     printf("Return Value: %d, Expected: %d \n\n", retVal, 0);
-    assert(retVal == 0);
 
+    //test and compare hand count in copied struct
     printf("\n----  - TEST 2: Hand Count  -  ----\n\n");
-    memcpy(&copyG, &G, sizeof(struct gameState));
 
     int addedCards = 4;
     int discard = 1;
     int currentPlayer = whoseTurn(&G);
-    cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
 
+    for (i = 0; i < x; i++) {
+        memcpy(&copyG, &G, sizeof(struct gameState));
+        cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
+
+        if (copyG.handCount[currentPlayer] != G.handCount[currentPlayer] + addedCards - discard) {
+            pass = 0;
+            break;
+        };
+    };
     printf("Hand Count: %d, Expected: %d \n\n", copyG.handCount[currentPlayer], G.handCount[currentPlayer]+addedCards-discard);
-    assert(copyG.handCount[currentPlayer] == G.handCount[currentPlayer]+addedCards-discard);
 
-
+    //test number of buys adjusted by card function
     printf("\n----  - TEST 3: Number of Buys  -  ----\n\n");
-    memcpy(&copyG, &G, sizeof(struct gameState));
 
     int addedBuys = 1;
     currentPlayer = whoseTurn(&G);
-    cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
+
+    for (i = 0; i < x; i++) {
+        memcpy(&copyG, &G, sizeof(struct gameState));
+        cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
+        if (copyG.numBuys != G.numBuys + addedBuys) {
+            pass = 0;
+            break;
+        };
+    };
 
     printf("Buy Count: %d, Expected: %d \n\n", copyG.numBuys, G.numBuys+addedBuys);
-    assert(copyG.numBuys == G.numBuys+addedBuys);
 
+    //test that other player gets to draw
     printf("\n----  - TEST 4: Other Player Draw -  ----\n\n");
-    memcpy(&copyG, &G, sizeof(struct gameState));
 
     int playerHand[4];
     int copyPlayerHand[4];
     addedCards = 1;
     currentPlayer = whoseTurn(&G);
-    cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
 
-    for (i = 0; i < G.numPlayers; i++)
-    {
-        if ( i != currentPlayer )
-        {
-            copyPlayerHand[i] = copyG.handCount[i];
-            playerHand[i] =  G.handCount[i];
+    for (i = 0; i < x; i++) {
+        memcpy(&copyG, &G, sizeof(struct gameState));
+        cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
+
+        for (j = 0; j < G.numPlayers; j++) {
+            if (j != currentPlayer) {
+                copyPlayerHand[j] = copyG.handCount[j];
+                playerHand[j] = G.handCount[j];
+            }
         }
-    }
 
 
-    for (i = 0; i < G.numPlayers; i++)
-    {
-        if ( i != currentPlayer )
-        {
-            printf("Player %d Hand Count: %d, Expected: %d \n\n", i+1, copyPlayerHand[i], playerHand[i]+addedCards);
-            assert(copyPlayerHand[i] == playerHand[i]+addedCards);
+        for (j = 0; j < G.numPlayers; j++) {
+            if (j != currentPlayer) {
+                if (copyPlayerHand[j] != playerHand[j] + addedCards) {
+                    pass = 0;
+                    break;
+                }
+            }
         }
-    }
+    };
 
-    printf("->->  - TEST SUCCESSFULLY COMPLETED -  <-<-\n");
+    //Final bool check to see if testing passed or failed,  prints result to standard out
+    if (pass) {
+        printf("->->  - TEST SUCCESSFULLY COMPLETED -  <-<-\n");
+    } else{
+        printf("->->  - TEST FAILED -  <-<-\n");
+    }
 
     return 0;
 };
