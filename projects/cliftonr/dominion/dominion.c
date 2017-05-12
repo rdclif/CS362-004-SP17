@@ -656,7 +656,7 @@ int adventurerCard(int *drawntreasure, int *cardDrawn, struct gameState *state, 
             (*drawntreasure)++;
         else{
             temphand[*z]=*cardDrawn;
-            state->handCount[currentPlayer]++; //this should just remove the top card (the most recently drawn one).
+            state->handCount[currentPlayer]--; //this should just remove the top card (the most recently drawn one).
             (*z)++;
         }
     }
@@ -672,7 +672,7 @@ int adventurerCard(int *drawntreasure, int *cardDrawn, struct gameState *state, 
 int smithyCard(int currentPlayer, struct gameState *state, int handPos) {
     int i;
     //+3 Cards
-    for (i = 0; i <= 3; i++)
+    for (i = 0; i < 3; i++)
     {
         drawCard(currentPlayer, state);
     }
@@ -691,14 +691,15 @@ int council_roomCard(int currentPlayer, struct gameState *state, int handPos) {
     {
         drawCard(currentPlayer, state);
     }
-    
+
     //+1 Buy
     state->numBuys++;
+
     
     //Each other player draws a card
     for (i = 0; i < state->numPlayers; i++)
     {
-        if ( i == currentPlayer )
+		if ( i != currentPlayer )
         {
             drawCard(i, state);
         }
@@ -706,6 +707,7 @@ int council_roomCard(int currentPlayer, struct gameState *state, int handPos) {
     
     //put played card in played card pile
     discardCard(handPos, currentPlayer, state, 0);
+
     return 0;
 }
 
@@ -1260,7 +1262,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
 int discardCard(int handPos, int currentPlayer, struct gameState *state, int trashFlag)
 {
-	
+
   //if card is not trashed, added to Played pile 
   if (trashFlag < 1)
     {
