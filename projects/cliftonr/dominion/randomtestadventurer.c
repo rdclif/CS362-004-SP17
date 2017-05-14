@@ -1,6 +1,6 @@
 //
-// Created by Robert Clifton on 4/18/17.
-//cardtest2  unit test for the adventurer card function.
+// Created by Robert Clifton
+//randomtestadventurer - random test for adventurer card function
 //
 //to make and test: make randomtestadventurer.out
 //
@@ -33,9 +33,6 @@ int main() {
     int money, copyMoney;
     int totalCards, copytotalCards;
 
-    //initialize game state
-    //initializeGame(numbPlayers, k, randSeed, &G);
-
 
     //initialize random
     srand(time(NULL));
@@ -44,11 +41,14 @@ int main() {
     printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n", testCard);
 
     printf ("----  -RANDOM TESTS- ----\n");
+
+    //fill game struct with random numbers
     for (i = 0; i < x; i++){
         for (n = 0; n < sizeof(struct gameState)/ sizeof(int); n++) {
             ((int*)&G)[n] = rand() % 128;
         }
 
+        //set important struct vars to valid random input
         G.numPlayers = (rand() % 3)+2;
         G.whoseTurn = rand() % G.numPlayers;
         currentPlayer = whoseTurn(&G);
@@ -73,16 +73,17 @@ int main() {
             }
         }
 
-
+        //copy struct for testing and compare
         memcpy(&copyG, &G, sizeof(struct gameState));
 
+        //test return value
         retVal = cardEffect(adventurer, choice1, choice2, choice3, &copyG, handPos, &bonus);
         if (retVal != 0) {
             printf("Return Fail");
             pass = 0;
         };
 
-
+        //test hand count
         if (copyG.handCount[currentPlayer] != G.handCount[currentPlayer]+addedCards){
             pass = 0;
 			//printf("NP:%d, WT:%d, HC:%d, DC:%d, %d, HP:%d\n", G.numPlayers, G.whoseTurn, G.handCount[currentPlayer], G.deckCount[currentPlayer], G.discardCount[currentPlayer], handPos);
@@ -90,6 +91,7 @@ int main() {
             printf("Hand Count: %d, Expected: %d \n\n", copyG.handCount[currentPlayer], G.handCount[currentPlayer]+addedCards);
         }
 
+        //test deck and discard count
         totalCards = G.deckCount[currentPlayer] + G.discardCount[currentPlayer];
         copytotalCards = copyG.deckCount[currentPlayer] + copyG.discardCount[currentPlayer];
         if (copytotalCards != totalCards - addedCards) {
@@ -97,6 +99,7 @@ int main() {
             printf("Total Cards: %d, Expected: %d \n\n", copytotalCards, totalCards-addedCards);
         };
 
+        //test treasure count
         money = 0;
         n = 0;
         while (n < numHandCards(&G)) {

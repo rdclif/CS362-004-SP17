@@ -1,6 +1,6 @@
 //
-// Created by Robert Clifton on 4/18/17.
-//cardtest1  unit test for the smity card function.
+// Created by Robert Clifton
+//randomtestcard1 - random test for smithy card function
 //
 //to make and test: make randomtestcard1.out
 //
@@ -33,8 +33,6 @@ int main() {
 	int discard = 1;
 	int totalCards, copytotalCards;
 
-	//initialize game state
-    //initializeGame(numbPlayers, k, randSeed, &G);
 
 	//initialize random
 	srand(time(NULL));
@@ -43,11 +41,14 @@ int main() {
     printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n", testCard);
 
 	printf ("----  -RANDOM TESTS- ----\n");
+
+	//fill game struct with random numbers
 	for (i = 0; i < x; i++){
 		for (n = 0; n < sizeof(struct gameState)/ sizeof(int); n++) {
 			((int*)&G)[n] = rand() % 128;
 		}
 
+		//set important struct vars to valid random input
 		G.numPlayers = (rand() % 3)+2;
 		G.whoseTurn = rand() % G.numPlayers;
 		currentPlayer = whoseTurn(&G);
@@ -56,21 +57,23 @@ int main() {
 		G.discardCount[currentPlayer] = (rand() % (MAX_DECK/2))+1;
 		handPos = (rand() % G.handCount[currentPlayer]);
 
-
+		//copy struct for testing and compare
 		memcpy(&copyG, &G, sizeof(struct gameState));
 
+		//test return value
 		retVal = cardEffect(smithy, choice1, choice2, choice3, &copyG, handPos, &bonus);
 		if (retVal != 0) {
 			printf("Return Fail");
 			pass = 0;
 		};
 
-
+		//test hand count
 		if (copyG.handCount[currentPlayer] != G.handCount[currentPlayer]+addedCards-discard){
 			pass = 0;
 			printf("Hand Count: %d, Expected: %d \n\n", copyG.handCount[currentPlayer], G.handCount[currentPlayer]+addedCards-discard);
 		}
 
+		//test deck and discard count
 		totalCards = G.deckCount[currentPlayer] + G.discardCount[currentPlayer];
 		copytotalCards = copyG.deckCount[currentPlayer] + copyG.discardCount[currentPlayer];
 		if (copytotalCards != totalCards - addedCards) {

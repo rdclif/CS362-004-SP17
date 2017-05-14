@@ -1,6 +1,6 @@
 //
-// Created by Robert Clifton on 4/18/17.
-//cardtest3  unit test for the council_rooom card function.
+// Created by Robert Clifton
+//randomtestcard2  - random test for council room card function
 //
 //to make and test: make randomtestcard2.out
 //
@@ -37,11 +37,6 @@ int main() {
     int copyPlayerHand[4];
 	int totalCards, copytotalCards;
 
-
-    //initialize game state
-    //initializeGame(numbPlayers, k, randSeed, &G);
-
-
     //initialize random
     srand(time(NULL));
 
@@ -49,11 +44,14 @@ int main() {
     printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n", testCard);
 
     printf ("----  -RANDOM TESTS- ----\n");
+
+    //fill game struct with random numbers
     for (i = 0; i < x; i++){
         for (n = 0; n < sizeof(struct gameState)/ sizeof(int); n++) {
             ((int*)&G)[n] = rand() % 128;
         }
 
+        //set important struct vars to valid random input
         G.numPlayers = (rand() % 3)+2;
         G.whoseTurn = rand() % G.numPlayers;
         currentPlayer = whoseTurn(&G);
@@ -64,29 +62,31 @@ int main() {
         handPos = (rand() % G.handCount[currentPlayer]);
 
 
-
+        //copy struct for testing and compare
         memcpy(&copyG, &G, sizeof(struct gameState));
 
-
+        //test return value
         retVal = cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
         if (retVal != 0) {
             printf("Return Fail");
             pass = 0;
         };
 
-
+        //test hand count
         if (copyG.handCount[currentPlayer] != G.handCount[currentPlayer]+addedCards-discard){
             pass = 0;
             printf("Hand Count: %d, Expected: %d \n\n", copyG.handCount[currentPlayer], G.handCount[currentPlayer]+addedCards-discard);
         }
 
-		totalCards = G.deckCount[currentPlayer] + G.discardCount[currentPlayer];
+		//test deck and discard count
+        totalCards = G.deckCount[currentPlayer] + G.discardCount[currentPlayer];
 		copytotalCards = copyG.deckCount[currentPlayer] + copyG.discardCount[currentPlayer];
 		if (copytotalCards != totalCards - addedCards) {
 			pass = 0;
 			printf("Total Cards: %d, Expected: %d \n\n", copytotalCards, totalCards-addedCards);
 		};
 
+        //test buy count
         if (copyG.numBuys != G.numBuys + addedBuys) {
             pass = 0;
             printf("Buy Count: %d, Expected: %d \n\n", copyG.numBuys, G.numBuys+addedBuys);
@@ -99,7 +99,7 @@ int main() {
             }
         }
 
-
+        //test the other players hand count
         for (n = 0; n < G.numPlayers; n++) {
             if (n != currentPlayer) {
                 if (copyPlayerHand[n] != playerHand[n] + otherPlrAdded) {
