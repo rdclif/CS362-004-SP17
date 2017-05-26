@@ -1,0 +1,186 @@
+        -:    0:Source:randomtestadventurer.c
+        -:    0:Graph:randomtestadventurer.gcno
+        -:    0:Data:randomtestadventurer.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1://
+        -:    2:// Created by Robert Clifton on 4/18/17.
+        -:    3://cardtest2  unit test for the adventurer card function.
+        -:    4://
+        -:    5://to make and test: make randomtestadventurer.out
+        -:    6://
+        -:    7://gcc dominion.c rngs.c randomtestadventurer.c -o randomtestadventurer
+        -:    8:
+        -:    9:#include "dominion.h"
+        -:   10:#include "dominion_helpers.h"
+        -:   11:#include <string.h>
+        -:   12:#include <stdio.h>
+        -:   13:#include <assert.h>
+        -:   14:#include "rngs.h"
+        -:   15:#include <stdlib.h>
+        -:   16:#include <math.h>
+        -:   17:#include <time.h>
+        -:   18:
+function main called 1 returned 100% blocks executed 92%
+        -:   19:int main() {
+        -:   20:
+        1:   21:    int pass = 1;
+        1:   22:    char testCard[] = "adventurer";
+        -:   23:    struct gameState G, copyG;
+        -:   24:    //int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse, sea_hag, tribute, smithy};
+        -:   25:
+        1:   26:    int x = 1000;
+        -:   27:    int i, n, r, retVal;
+        1:   28:    int handPos = 0;
+        1:   29:    int choice1 = 0, choice2 = 0, choice3 = 0;
+        1:   30:    int bonus = 0;
+        -:   31:    int currentPlayer;
+        1:   32:    int addedCards = 2;
+        -:   33:    int money, copyMoney;
+        -:   34:    int totalCards, copytotalCards;
+        -:   35:
+        -:   36:    //initialize game state
+        -:   37:    //initializeGame(numbPlayers, k, randSeed, &G);
+        -:   38:
+        -:   39:
+        -:   40:    //initialize random
+        1:   41:    srand(time(NULL));
+        -:   42:
+        -:   43:
+        1:   44:    printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n", testCard);
+        -:   45:
+        1:   46:    printf ("----  -RANDOM TESTS- ----\n");
+     2002:   47:    for (i = 0; i < x; i++){
+branch  0 taken 1000
+branch  1 taken 1
+ 13152000:   48:        for (n = 0; n < sizeof(struct gameState)/ sizeof(int); n++) {
+branch  0 taken 6575000
+branch  1 taken 1000
+  6575000:   49:            ((int*)&G)[n] = rand() % 128;
+  6575000:   50:        }
+        -:   51:
+     1000:   52:        G.numPlayers = (rand() % 3)+2;
+     1000:   53:        G.whoseTurn = rand() % G.numPlayers;
+     1000:   54:        currentPlayer = whoseTurn(&G);
+     1000:   55:        G.handCount[currentPlayer] = (rand() % (MAX_HAND/2))+1;
+     1000:   56:        G.deckCount[currentPlayer] = (rand() % (MAX_DECK/2))+1;
+     1000:   57:        G.discardCount[currentPlayer] = (rand() % (MAX_DECK/2))+1;
+     1000:   58:        handPos = (rand() % G.handCount[currentPlayer]);
+   250688:   59:        for (n = 0; n < G.handCount[currentPlayer]; n++) {
+branch  0 taken 124344
+branch  1 taken 1000
+   124344:   60:            r = (rand() % 2);
+   124344:   61:            if (r == 0) {
+branch  0 taken 62154
+branch  1 taken 62190
+    62154:   62:                G.hand[currentPlayer][n] = copper;
+    62154:   63:            } else {
+    62190:   64:                G.hand[currentPlayer][n] = estate;
+        -:   65:            }
+   124344:   66:        }
+   256792:   67:        for (n = 0; n < G.deckCount[currentPlayer]; n++) {
+branch  0 taken 127396
+branch  1 taken 1000
+   127396:   68:            r = (rand() % 2);
+   127396:   69:            if (r == 0) {
+branch  0 taken 63684
+branch  1 taken 63712
+    63684:   70:                G.deck[currentPlayer][n] = copper;
+    63684:   71:            } else {
+    63712:   72:                G.deck[currentPlayer][n] = estate;
+        -:   73:            }
+   127396:   74:        }
+        -:   75:
+        -:   76:
+     1000:   77:        memcpy(&copyG, &G, sizeof(struct gameState));
+        -:   78:
+     1000:   79:        retVal = cardEffect(adventurer, choice1, choice2, choice3, &copyG, handPos, &bonus);
+     1000:   80:        if (retVal != 0) {
+branch  0 taken 0
+branch  1 taken 1000
+    #####:   81:            printf("Return Fail");
+    #####:   82:            pass = 0;
+    #####:   83:        };
+        -:   84:
+        -:   85:
+     1000:   86:        if (copyG.handCount[currentPlayer] != G.handCount[currentPlayer]+addedCards){
+branch  0 taken 1
+branch  1 taken 999
+        1:   87:            pass = 0;
+        -:   88:			//printf("NP:%d, WT:%d, HC:%d, DC:%d, %d, HP:%d\n", G.numPlayers, G.whoseTurn, G.handCount[currentPlayer], G.deckCount[currentPlayer], G.discardCount[currentPlayer], handPos);
+        -:   89:			//printf("NP:%d, WT:%d, HC:%d, DC:%d, %d, HP:%d\n", copyG.numPlayers, copyG.whoseTurn, copyG.handCount[currentPlayer], copyG.deckCount[currentPlayer], copyG.discardCount[currentPlayer], handPos);
+        1:   90:            printf("Hand Count: %d, Expected: %d \n\n", copyG.handCount[currentPlayer], G.handCount[currentPlayer]+addedCards);
+        1:   91:        }
+        -:   92:
+     1000:   93:        totalCards = G.deckCount[currentPlayer] + G.discardCount[currentPlayer];
+     1000:   94:        copytotalCards = copyG.deckCount[currentPlayer] + copyG.discardCount[currentPlayer];
+     1000:   95:        if (copytotalCards != totalCards - addedCards) {
+branch  0 taken 1
+branch  1 taken 999
+        1:   96:            pass = 0;
+        1:   97:            printf("Total Cards: %d, Expected: %d \n\n", copytotalCards, totalCards-addedCards);
+        1:   98:        };
+        -:   99:
+     1000:  100:        money = 0;
+     1000:  101:        n = 0;
+   250688:  102:        while (n < numHandCards(&G)) {
+branch  0 taken 124344
+branch  1 taken 1000
+   124344:  103:            if (handCard(n, &G) == copper) {
+branch  0 taken 62154
+branch  1 taken 62190
+    62154:  104:                money++;
+   124344:  105:            } else if (handCard(n, &G) == silver) {
+branch  0 taken 0
+branch  1 taken 62190
+    #####:  106:                money += 2;
+    62190:  107:            } else if (handCard(n, &G) == gold) {
+branch  0 taken 0
+branch  1 taken 62190
+    #####:  108:                money += 3;
+    #####:  109:            }
+   124344:  110:            n++;
+        -:  111:        }
+        -:  112:
+     1000:  113:        copyMoney = 0;
+     1000:  114:        n = 0;
+   254686:  115:        while (n < numHandCards(&copyG)) {
+branch  0 taken 126343
+branch  1 taken 1000
+   126343:  116:            if (handCard(n, &copyG) == copper) {
+branch  0 taken 64145
+branch  1 taken 62198
+    64145:  117:                copyMoney++;
+   126343:  118:            } else if (handCard(n, &copyG) == silver) {
+branch  0 taken 4
+branch  1 taken 62194
+        4:  119:                copyMoney += 2;
+    62198:  120:            } else if (handCard(n, &copyG) == gold) {
+branch  0 taken 4
+branch  1 taken 62190
+        4:  121:                copyMoney += 3;
+        4:  122:            }
+   126343:  123:            n++;
+        -:  124:        };
+     1000:  125:        if (copyMoney < money+2) {
+branch  0 taken 1
+branch  1 taken 999
+        1:  126:            pass = 0;
+        1:  127:            printf("Money Count: %d, Expected Money Count: >= %d \n\n", copyMoney, money+2);
+        1:  128:        }
+        -:  129:        
+        -:  130:
+     1000:  131:    }
+        -:  132:
+        -:  133:
+        -:  134:    //Final bool check to see if testing passed or failed,  prints result to standard out
+        1:  135:    if (pass) {
+branch  0 taken 0
+branch  1 taken 1
+    #####:  136:        printf("->->  - TEST SUCCESSFULLY COMPLETED -  <-<-\n");
+    #####:  137:    } else{
+        1:  138:        printf("->->  - TEST FAILED -  <-<-\n");
+        -:  139:    }
+        -:  140:
+        1:  141:    return 0;
+        -:  142:};

@@ -1,0 +1,104 @@
+        -:    0:Source:unittest4.c
+        -:    0:Graph:unittest4.gcno
+        -:    0:Data:unittest4.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1://
+        -:    2:// Created by Robert Clifton on 4/18/17.
+        -:    3://unittest4  unit test for the isGameOver function.
+        -:    4://
+        -:    5://to make and test: make unittestresults.out
+        -:    6://
+        -:    7://gcc dominion.c rngs.c unittest4.c -o unittest4
+        -:    8:
+        -:    9:#include "dominion.h"
+        -:   10:#include "dominion_helpers.h"
+        -:   11:#include <string.h>
+        -:   12:#include <stdio.h>
+        -:   13:#include <assert.h>
+        -:   14:#include "rngs.h"
+        -:   15:#include <stdlib.h>
+        -:   16:
+        -:   17:int main() {
+        1:   18:    int pass = 1;
+        1:   19:    char testFunction[] = "isGameOver()";
+        -:   20:    struct gameState G, copyG;
+        1:   21:    int x = 1000;
+        -:   22:    int i;
+        -:   23:    int retVal;
+        -:   24:
+        1:   25:    int randSeed = 2;
+        1:   26:    int numbPlayers = 2;
+        -:   27:
+        1:   28:    int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
+        -:   29:                 sea_hag, tribute, smithy};
+        -:   30:
+        1:   31:    initializeGame(numbPlayers, k, randSeed, &G);
+        -:   32:
+        1:   33:    printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n\n", testFunction);
+        -:   34:
+        -:   35:    //basic test of return value
+        1:   36:    printf("\n----  - TEST 1: Return Value = 0 -  ----\n\n");
+        1:   37:    memcpy(&copyG, &G, sizeof(struct gameState));
+        -:   38:
+     2002:   39:    for (i = 0; i < x; i++) {
+     1000:   40:        retVal = isGameOver(&copyG);
+     1000:   41:        if (retVal != 0) {
+    #####:   42:            printf("test 1 fail Return != 0");
+    #####:   43:            pass = 0;
+    #####:   44:        };
+     1000:   45:    }
+        -:   46:
+        -:   47:    //test when two supply piles are at 0
+        1:   48:    printf("\n----  - TEST 2: Two Supply Piles = 0 -  ----\n\n");
+        1:   49:    memcpy(&copyG, &G, sizeof(struct gameState));
+        -:   50:
+        -:   51:    //set supply count of two piles to  0;
+        1:   52:    copyG.supplyCount[1] = 0;
+        1:   53:    copyG.supplyCount[2] = 0;
+        -:   54:
+     2002:   55:    for (i = 0; i < x; i++) {
+     1000:   56:        retVal = isGameOver(&copyG);
+     1000:   57:        if (retVal != 0) {
+    #####:   58:            printf("test 2 fail Return != 0");
+    #####:   59:            pass = 0;
+    #####:   60:        };
+     1000:   61:    }
+        -:   62:
+        -:   63:    //test when province pile count is at 0
+        1:   64:    printf("\n----  - TEST 3: Province Count = 0 -  ----\n\n");
+        1:   65:    memcpy(&copyG, &G, sizeof(struct gameState));
+        1:   66:    copyG.supplyCount[province] = 0;
+        -:   67:
+     2002:   68:    for (i = 0; i < x; i++) {
+     1000:   69:        retVal = isGameOver(&copyG);
+     1000:   70:        if (retVal != 1) {
+    #####:   71:            printf("test 3 fail Return != 1");
+    #####:   72:            pass = 0;
+    #####:   73:        };
+     1000:   74:    }
+        -:   75:
+        -:   76:    //test when > three supply piles are at 0
+        1:   77:    printf("\n----  - TEST 4 > Three Supply Piles = 0 -  ----\n\n");
+        1:   78:    memcpy(&copyG, &G, sizeof(struct gameState));
+        1:   79:    copyG.supplyCount[duchy] = 0;
+        1:   80:    copyG.supplyCount[estate] = 0;
+        1:   81:    copyG.supplyCount[copper] = 0;
+        1:   82:    copyG.supplyCount[gold] = 0;
+        -:   83:
+     2002:   84:    for (i = 0; i < x; i++) {
+     1000:   85:        retVal = isGameOver(&copyG);
+     1000:   86:        if (retVal != 1) {
+    #####:   87:            printf("test 4 fail Return != 1");
+    #####:   88:            pass = 0;
+    #####:   89:        };
+     1000:   90:    }
+        -:   91:
+        -:   92:    //Final bool check to see if testing passed or failed,  prints result to standard out
+        1:   93:    if (pass) {
+        1:   94:        printf("->->  - TEST SUCCESSFULLY COMPLETED -  <-<-\n");
+        1:   95:    } else{
+    #####:   96:        printf("->->  - TEST FAILED -  <-<-\n");
+        -:   97:    }
+        1:   98:    return 0;
+        -:   99:};

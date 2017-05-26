@@ -1,91 +1,182 @@
-/* -----------------------------------------------------------------------
- * Assignment 3
- * unittest3.c
- * Shreyans Khunteta
- *
- * Include the following lines in your makefile:
- *
- * unittest3: unittest3.c dominion.o rngs.o
- *      gcc -o unittest3 -g  unittest3.c dominion.o rngs.o $(CFLAGS)
- *
- * -----------------------------------------------------------------------
- */
+//
+// Created by Robert Clifton on 4/18/17.
+//unittest3  unit test for the updateCoins function.
+//
+//to make and test: make unittestresults.out
+//
+//gcc dominion.c rngs.c unittest3.c -o unittest3
 
-// unit testing for the scoreFor function
 #include "dominion.h"
 #include "dominion_helpers.h"
-#include "rngs.h"
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
+#include "rngs.h"
+#include <stdlib.h>
 
-// int scoreFor (int player, struct gameState *state)
-// returns the point total from a player's hand, deck, and discard pile
 int main() {
-    printf("\n####################\n");
-    printf("Unit test 3 - scoreFor()\n");
 
-    int i, p, r, testReturn;
-    int seed = 999;
-    int numPlayer = 2;
-    int k[10] = {adventurer, council_room, feast, gardens, mine, remodel, smithy, village, baron, great_hall};
-    struct gameState G;
-    int handCount = 5;
-    int discardCount = 10;
-    int deckCount = 15;
-    int estates[MAX_HAND];
-    int great_halls[MAX_HAND];
-    int gardenses[MAX_HAND];
-    for (i = 0; i < MAX_HAND; i++) {
-        estates[i] = estate;
-        great_halls[i] = great_hall;
-        gardenses[i] = gardens;
+    char testFunction[] = "updateCoins()";
+    struct gameState G, copyG;
+    int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
+                 sea_hag, tribute, smithy};
+
+    int pass = 1;
+    int i, retVal;
+    int x = 1000;
+    int randSeed = 2;
+    int numbPlayers = 2;
+    int bonus = 0;
+    int player = 0;
+
+    //initialize game state
+    initializeGame(numbPlayers, k, randSeed, &G);
+
+    printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n\n", testFunction);
+
+    //basic test of return value
+    printf("\n----  - TEST 1: Return Value -  ----\n\n");
+    memcpy(&copyG, &G, sizeof(struct gameState));
+
+    for (i = 0; i < x; i++) {
+        retVal = updateCoins(player, &copyG, bonus);
+        if (retVal != 0) {
+            printf("test 1 fail Return != 0\n");
+            pass = 0;
+        };
     }
 
-    // cycle through each player
-    for (p = 0; p < numPlayer; p++) {
-        printf("\n--- Testing player %d\n", p);
+    printf("Return Value: %d, Expected: %d \n\n", retVal, 0);
 
-        memset(&G, 23, sizeof(struct gameState));
-        r = initializeGame(numPlayer, k, seed, &G);
-        G.handCount[p] = handCount;
-        G.discardCount[p] = discardCount;
-        G.deckCount[p] = deckCount;
+    //test and compare hand count in copied struct
+    printf("\n----  - TEST 2: Hand Count  -  ----\n\n");
+    memcpy(&copyG, &G, sizeof(struct gameState));
 
-        printf("TEST 1: Testing Estates: 5 in hand, 10 in discard, 15 in deck\n");
-        memcpy(G.hand[p], estates, sizeof(int) * handCount);
-        memcpy(G.discard[p], estates, sizeof(int) * discardCount);
-        memcpy(G.deck[p], estates, sizeof(int) * deckCount);
+    for (i = 0; i < x; i++) {
+        updateCoins(player, &copyG, bonus);
+        if (copyG.handCount[player] != G.handCount[player]) {
+            printf("test 2 hand count fail, Got: %d, Expected: %d\n", copyG.handCount[player], G.handCount[player]);
+            pass = 0;
+        };
+    }
 
-        testReturn = scoreFor(p, &G);
-        if (testReturn == 30)
-            printf("scoreFor() passes -  returned score 30\n");
-        else
-            printf("scoreFor() fails -  returned score %d, expected 30\n", testReturn);
+    printf("Hand Count: %d, Expected: %d \n\n", copyG.handCount[player], G.handCount[player]);
 
-        printf("TEST 2: Testing Great Halls: 5 in hand, 10 in discard, 15 in deck\n");
-        memcpy(G.hand[p], great_halls, sizeof(int) * handCount);
-        memcpy(G.discard[p], great_halls, sizeof(int) * discardCount);
-        memcpy(G.deck[p], great_halls, sizeof(int) * deckCount);
-
-        testReturn = scoreFor(p, &G);
-        if (testReturn == 180)
-            printf("scoreFor() passes -  returned score 180\n");
-        else
-            printf("scoreFor() fails -  returned score %d, expected 180\n", testReturn);
+    //test count with copper coin cards
+    printf("\n----  - TEST 3:Copper Coin Count -  ----\n\n");
+    memcpy(&copyG, &G, sizeof(struct gameState));
+    int z = copyG.handCount[player];
+    int j;
+    int coinValue = 1;
+    int expectedCoinCount = z *coinValue;
 
 
-        printf("TEST 3: Testing Gardens: 5 in hand, 10 in discard, 15 in deck\n");
-        memcpy(G.hand[p], gardenses, sizeof(int) * handCount);
-        memcpy(G.discard[p], gardenses, sizeof(int) * discardCount);
-        memcpy(G.deck[p], gardenses, sizeof(int) * deckCount);
+
+    for (i = 0; i < x; i++) {
+        //fill hand with copper coins
+        for (j = 0; j < z; j++) {
+            copyG.hand[player][j] = copper;
+        }
+        updateCoins(player, &copyG, bonus);
+        if (copyG.coins != expectedCoinCount) {
+            printf("test 3 coin count fail, Got: %d, Expected: %d\n", copyG.coins, expectedCoinCount);
+            pass = 0;
+        }
+    }
+    printf("Coins: %d, Expected: %d \n\n", copyG.coins, expectedCoinCount);
+
+    //test count with silver coin cards
+    printf("\n----  - TEST 4:Silver Coin Count -  ----\n\n");
+    memcpy(&copyG, &G, sizeof(struct gameState));
+    z = copyG.handCount[player];
+    coinValue = 2;
+    expectedCoinCount = z *coinValue;
 
 
-        testReturn = scoreFor(p, &G);
-        if (testReturn == 90)
-            printf("scoreFor() passes -  returned score 90\n");
-        else
-            printf("scoreFor() fails -  returned score %d, expected 90\n", testReturn);
+
+    for (i = 0; i < x; i++) {
+        //fill hand with silver coins
+        for (j = 0; j < z; j++) {
+            copyG.hand[player][j] = silver;
+        }
+        updateCoins(player, &copyG, bonus);
+        if (copyG.coins != expectedCoinCount) {
+            printf("test 4 coin count fail, Got: %d, Expected: %d\n", copyG.coins, expectedCoinCount);
+            pass = 0;
+        }
+    }
+    printf("Coins: %d, Expected: %d \n\n", copyG.coins, expectedCoinCount);
+
+    //test count with gold coin cards
+    printf("\n----  - TEST 5:Gold Coin Count -  ----\n\n");
+    memcpy(&copyG, &G, sizeof(struct gameState));
+    z = copyG.handCount[player];
+    coinValue = 3;
+    expectedCoinCount = z *coinValue;
+
+
+
+    for (i = 0; i < x; i++) {
+        //fill hand with gold coins
+        for (j = 0; j < z; j++) {
+            copyG.hand[player][j] = gold;
+        }
+        updateCoins(player, &copyG, bonus);
+        if (copyG.coins != expectedCoinCount) {
+            printf("test 5 coin count fail, Got: %d, Expected: %d\n", copyG.coins, expectedCoinCount);
+            pass = 0;
+        }
+    }
+    printf("Coins: %d, Expected: %d \n\n", copyG.coins, expectedCoinCount);
+
+    //test count with mixed cards
+    printf("\n----  - TEST 6:Mixed Coin Count -  ----\n\n");
+    memcpy(&copyG, &G, sizeof(struct gameState));
+    copyG.handCount[player] = 5;
+    expectedCoinCount = 9;
+
+
+
+    for (i = 0; i < x; i++) {
+        //fill hand with coin cards
+        copyG.hand[player][0] = copper;
+        copyG.hand[player][1] = copper;
+        copyG.hand[player][2] = silver;
+        copyG.hand[player][3] = silver;
+        copyG.hand[player][4] = gold;
+
+        updateCoins(player, &copyG, bonus);
+        if (copyG.coins != expectedCoinCount) {
+            printf("test 6 coin count fail, Got: %d, Expected: %d\n", copyG.coins, expectedCoinCount);
+            pass = 0;
+        }
+    }
+    printf("Coins: %d, Expected: %d \n\n", copyG.coins, expectedCoinCount);
+
+    //test addition of bonus
+    printf("\n----  - TEST 7: Bonus -  ----\n\n");
+    memcpy(&copyG, &G, sizeof(struct gameState));
+    copyG.handCount[player] = 0;
+    bonus = 1;
+    expectedCoinCount = 1;
+
+
+    for (i = 0; i < x; i++) {
+        //fill hand with coins
+
+        updateCoins(player, &copyG, bonus);
+        if (copyG.coins != expectedCoinCount) {
+            printf("test 7 coin count fail, Got: %d, Expected: %d\n", copyG.coins, expectedCoinCount);
+            pass = 0;
+        }
+    }
+    printf("Coins: %d, Expected: %d \n\n", copyG.coins, expectedCoinCount);
+
+    //Final bool check to see if testing passed or failed,  prints result to standard out
+    if (pass) {
+        printf("->->  - TEST SUCCESSFULLY COMPLETED -  <-<-\n");
+    } else{
+        printf("->->  - TEST FAILED -  <-<-\n");
     }
     return 0;
-}
+};

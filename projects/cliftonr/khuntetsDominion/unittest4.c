@@ -1,69 +1,99 @@
-/* -----------------------------------------------------------------------
- * Assignment 3
- * unittest4.c
- * Shreyans Khunteta
- *
- * Include the following lines in your makefile:
- *
- * unittest4: unittest4.c dominion.o rngs.o
- *      gcc -o unittest4 -g  unittest4.c dominion.o rngs.o $(CFLAGS)
- *
- * -----------------------------------------------------------------------
- */
+//
+// Created by Robert Clifton on 4/18/17.
+//unittest4  unit test for the isGameOver function.
+//
+//to make and test: make unittestresults.out
+//
+//gcc dominion.c rngs.c unittest4.c -o unittest4
 
-// unit testing the function isGameOver
 #include "dominion.h"
-#include "rngs.h"
 #include "dominion_helpers.h"
+#include <string.h>
 #include <stdio.h>
 #include <assert.h>
+#include "rngs.h"
 #include <stdlib.h>
 
-// int isGameOver(struct gameState *state)
-// returns 0 if the game is not over
-// returns -1 if the game is over:
-// the province supply is empty
-// or three of the supply piles are empty
 int main() {
-    printf("\n###################\n");
-    printf("Unit test 4 - shuffle()\n");
+    int pass = 1;
+    char testFunction[] = "isGameOver()";
+    struct gameState G, copyG;
+    int x = 1000;
+    int i;
+    int retVal;
 
-    int p, testOver;
-    int seed = 999;
-    int numPlayer = 2;
-    int k[10] = {adventurer, council_room, feast, gardens, mine, remodel, smithy, village, baron, great_hall};
-    struct gameState G;
+    int randSeed = 2;
+    int numbPlayers = 2;
 
-    for (p = 0; p < numPlayer; p++) {
-        printf("\n--- Testing player %d\n", p);
+    int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
+                 sea_hag, tribute, smithy};
 
-        // clear the gameState
-        memset(&G, 23, sizeof(struct gameState));
-        initializeGame(numPlayer, k, seed, &G);
+    initializeGame(numbPlayers, k, randSeed, &G);
 
-        printf("TEST 1: Testing incomplete game\n");
-        testOver = isGameOver(&G);
-        if (testOver == 0)
-            printf("isGameOver() passes -  game will continue\n");
-        else
-            printf("isGameOver() fails -  game ended incorrectly\n");
+    printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n\n", testFunction);
 
-        printf("TEST 2: Testing empty Province pile "
-         "as that ends the game\n");
-        G.supplyCount[province] = 0;
-        testOver = isGameOver(&G);
-        if (testOver == 1)
-            printf("isGameOver() passes -  game ended correctly\n");
-        else
-            printf("isGameOver() fails -  game continues\n");
+    //basic test of return value
+    printf("\n----  - TEST 1: Return Value = 0 -  ----\n\n");
+    memcpy(&copyG, &G, sizeof(struct gameState));
 
-        printf("TEST 3: Testing three empty supply piles\n");
-        G.supplyCount[4] = 0;
-        testOver = isGameOver(&G);
-        if (testOver == 1)
-            printf("isGameOver() passes -  game ended correctly\n");
-        else
-            printf("isGameOver() fails -  game continues\n");
+    for (i = 0; i < x; i++) {
+        retVal = isGameOver(&copyG);
+        if (retVal != 0) {
+            printf("test 1 fail Return != 0");
+            pass = 0;
+        };
+    }
+
+    //test when two supply piles are at 0
+    printf("\n----  - TEST 2: Two Supply Piles = 0 -  ----\n\n");
+    memcpy(&copyG, &G, sizeof(struct gameState));
+
+    //set supply count of two piles to  0;
+    copyG.supplyCount[1] = 0;
+    copyG.supplyCount[2] = 0;
+
+    for (i = 0; i < x; i++) {
+        retVal = isGameOver(&copyG);
+        if (retVal != 0) {
+            printf("test 2 fail Return != 0");
+            pass = 0;
+        };
+    }
+
+    //test when province pile count is at 0
+    printf("\n----  - TEST 3: Province Count = 0 -  ----\n\n");
+    memcpy(&copyG, &G, sizeof(struct gameState));
+    copyG.supplyCount[province] = 0;
+
+    for (i = 0; i < x; i++) {
+        retVal = isGameOver(&copyG);
+        if (retVal != 1) {
+            printf("test 3 fail Return != 1");
+            pass = 0;
+        };
+    }
+
+    //test when > three supply piles are at 0
+    printf("\n----  - TEST 4 > Three Supply Piles = 0 -  ----\n\n");
+    memcpy(&copyG, &G, sizeof(struct gameState));
+    copyG.supplyCount[duchy] = 0;
+    copyG.supplyCount[estate] = 0;
+    copyG.supplyCount[copper] = 0;
+    copyG.supplyCount[gold] = 0;
+
+    for (i = 0; i < x; i++) {
+        retVal = isGameOver(&copyG);
+        if (retVal != 1) {
+            printf("test 4 fail Return != 1");
+            pass = 0;
+        };
+    }
+
+    //Final bool check to see if testing passed or failed,  prints result to standard out
+    if (pass) {
+        printf("->->  - TEST SUCCESSFULLY COMPLETED -  <-<-\n");
+    } else{
+        printf("->->  - TEST FAILED -  <-<-\n");
     }
     return 0;
-}
+};

@@ -1,0 +1,141 @@
+Bugs in Teammate Code
+==============================
+
+Title: feastEffect function no return
+
+Class: Serious Bug 
+
+Date: 05/19/2017        
+Reported By: Robert Clifton     
+
+
+Product: dominion.c              
+   
+
+Is it reproducible: Yes
+
+Description
+===========
+festEffect function gets stuck and is unable to return when player choice is too expensive, or when supply count is <= 0.
+
+
+Steps to Produce/Reproduce
+--------------------------
+Create game struct
+Set struct supplyCount = 0
+pass into cardEffect function with feast as card type
+Result: Infinite Loop
+
+-or-
+
+Create game struct
+Set choice1 variable to > 5
+pass into cardEffect function with feast as card type
+Result: Infinite Loop
+
+Expected Results
+----------------
+Function should produce some sort of error and return failure. 
+
+
+Actual Results
+--------------
+function stuck in loop 
+
+
+Workarounds
+-----------
+Added return -1 statements to feast function under if statements, this allows function to exit 
+
+============================================
+
+Title: smithyEffect handCount error
+
+Class: Function Result Error  
+
+Date: 05/19/2017        
+Reported By: Robert Clifton     
+
+
+Product: dominion.c              
+   
+
+Is it reproducible: Yes
+
+Description
+===========
+smithyEffect function results in an incorrect number of cards being added to the player handCount.
+
+
+Steps to Produce/Reproduce
+--------------------------
+Create game struct
+pass into cardEffect function with smithy as card type 
+Result:  two fewer cards then expected in player handCount
+
+
+Expected Results
+----------------
+smithy card should add three cards to player handCount, then discard one. 
+
+
+Actual Results
+--------------
+handCount is two less then expected.
+
+
+Workarounds
+-----------
+N/A
+
+
+Other Information
+-----------------
+----  - TEST 2: Hand Count  -  ----Hand Count: 5, Expected: 7 
+
+
+============================================
+
+Title: council_room_effect handCount error
+
+Class: Function Result Error  
+
+Date: 05/19/2017        
+Reported By: Robert Clifton     
+
+
+Product: dominion.c              
+   
+
+Is it reproducible: Yes
+
+Description
+===========
+council_room_effect function results in an incorrect number of cards being added to the player handCount.
+
+
+Steps to Produce/Reproduce
+--------------------------
+Create game struct
+pass into cardEffect function with council_room as card type 
+Result: one extra card in handCount 
+
+
+Expected Results
+----------------
+council_room card should add four cards to player handCount, increase number of buys, allow other players to draw card, and then discard current player card. 
+
+
+Actual Results
+--------------
+handCount one more then expected 
+
+
+Workarounds
+-----------
+N/A
+
+
+Other Information
+-----------------
+----  - TEST 2: Hand Count  -  ----Hand Count: 9, Expected: 8 

@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+		<item value="/Users/robertclifton/CS362-004-SP17/projects/cliftonr/FinalProject/URLValidatorInCorrect"/>
 		<item value="/Users/robertclifton/CS362-004-SP17/projects/cliftonr/FinalProject/URLValidatorCorrect"/>
 	</list>
+	<section name="ResourceNavigator">
+		<item value="Aggregate for window 1494001563392" key="ResourceWorkingSetFilter.STORE_WORKING_SET"/>
+		<item value="1" key="ResourceViewer.STORE_SORT_TYPE"/>
+		<item value="false" key="LINK_NAVIGATOR_TO_EDITOR"/>
+	</section>
 </section>
