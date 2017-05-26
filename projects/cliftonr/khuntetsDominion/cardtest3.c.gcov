@@ -1,0 +1,129 @@
+        -:    0:Source:cardtest3.c
+        -:    0:Graph:cardtest3.gcno
+        -:    0:Data:cardtest3.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1://
+        -:    2:// Created by Robert Clifton on 4/18/17.
+        -:    3://cardtest3  unit test for the council_rooom card function.
+        -:    4://
+        -:    5://to make and test: make unittestresults.out
+        -:    6://
+        -:    7://gcc dominion.c rngs.c cardtest3.c -o cardtest3
+        -:    8:
+        -:    9:#include "dominion.h"
+        -:   10:#include "dominion_helpers.h"
+        -:   11:#include <string.h>
+        -:   12:#include <stdio.h>
+        -:   13:#include <assert.h>
+        -:   14:#include "rngs.h"
+        -:   15:#include <stdlib.h>
+        -:   16:
+        -:   17:int main() {
+        -:   18:
+        1:   19:    int pass = 1;
+        1:   20:    char testCard[] = "council_room";
+        -:   21:    struct gameState G, copyG;
+        1:   22:    int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
+        -:   23:                 sea_hag, tribute, smithy};
+        -:   24:    int j, i, retVal;
+        1:   25:    int x = 1000;
+        1:   26:    int numbPlayers = 2;
+        1:   27:    int randSeed = 10000000;
+        1:   28:    int handPos = 0;
+        1:   29:    int choice1 = 0, choice2 = 0, choice3 = 0;
+        1:   30:    int bonus = 0;
+        -:   31:
+        -:   32:
+        -:   33:    //initialize game state
+        1:   34:    initializeGame(numbPlayers, k, randSeed, &G);
+        -:   35:
+        -:   36:
+        1:   37:    printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n\n", testCard);
+        -:   38:
+        -:   39:    //basic test of return value
+        1:   40:    printf("\n----  - TEST 1: Function Return  -  ----\n\n");
+     2002:   41:    for (i = 0; i < x; i++) {
+     1000:   42:        memcpy(&copyG, &G, sizeof(struct gameState));
+     1000:   43:        retVal = cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
+     1000:   44:        if (retVal != 0) {
+    #####:   45:            pass = 0;
+    #####:   46:            break;
+        -:   47:        };
+     1000:   48:    };
+        1:   49:    printf("Return Value: %d, Expected: %d \n\n", retVal, 0);
+        -:   50:
+        -:   51:    //test and compare hand count in copied struct
+        1:   52:    printf("\n----  - TEST 2: Hand Count  -  ----\n\n");
+        -:   53:
+        1:   54:    int addedCards = 4;
+        1:   55:    int discard = 1;
+        1:   56:    int currentPlayer = whoseTurn(&G);
+        -:   57:
+        2:   58:    for (i = 0; i < x; i++) {
+        1:   59:        memcpy(&copyG, &G, sizeof(struct gameState));
+        1:   60:        cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
+        -:   61:
+        1:   62:        if (copyG.handCount[currentPlayer] != G.handCount[currentPlayer] + addedCards - discard) {
+        1:   63:            pass = 0;
+        1:   64:            break;
+        -:   65:        };
+    #####:   66:    };
+        1:   67:    printf("Hand Count: %d, Expected: %d \n\n", copyG.handCount[currentPlayer], G.handCount[currentPlayer]+addedCards-discard);
+        -:   68:
+        -:   69:    //test number of buys adjusted by card function
+        1:   70:    printf("\n----  - TEST 3: Number of Buys  -  ----\n\n");
+        -:   71:
+        1:   72:    int addedBuys = 1;
+        1:   73:    currentPlayer = whoseTurn(&G);
+        -:   74:
+     2002:   75:    for (i = 0; i < x; i++) {
+     1000:   76:        memcpy(&copyG, &G, sizeof(struct gameState));
+     1000:   77:        cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
+     1000:   78:        if (copyG.numBuys != G.numBuys + addedBuys) {
+    #####:   79:            pass = 0;
+    #####:   80:            break;
+        -:   81:        };
+     1000:   82:    };
+        -:   83:
+        1:   84:    printf("Buy Count: %d, Expected: %d \n\n", copyG.numBuys, G.numBuys+addedBuys);
+        -:   85:
+        -:   86:    //test that other player gets to draw
+        1:   87:    printf("\n----  - TEST 4: Other Player Draw -  ----\n\n");
+        -:   88:
+        -:   89:    int playerHand[4];
+        -:   90:    int copyPlayerHand[4];
+        1:   91:    addedCards = 1;
+        1:   92:    currentPlayer = whoseTurn(&G);
+        -:   93:
+     2002:   94:    for (i = 0; i < x; i++) {
+     1000:   95:        memcpy(&copyG, &G, sizeof(struct gameState));
+     1000:   96:        cardEffect(council_room, choice1, choice2, choice3, &copyG, handPos, &bonus);
+        -:   97:
+     6000:   98:        for (j = 0; j < G.numPlayers; j++) {
+     2000:   99:            if (j != currentPlayer) {
+     1000:  100:                copyPlayerHand[j] = copyG.handCount[j];
+     1000:  101:                playerHand[j] = G.handCount[j];
+     1000:  102:            }
+     2000:  103:        }
+        -:  104:
+        -:  105:
+     6000:  106:        for (j = 0; j < G.numPlayers; j++) {
+     2000:  107:            if (j != currentPlayer) {
+     1000:  108:                if (copyPlayerHand[j] != playerHand[j] + addedCards) {
+    #####:  109:                    pass = 0;
+    #####:  110:                    break;
+        -:  111:                }
+     1000:  112:            }
+     2000:  113:        }
+     1000:  114:    };
+        -:  115:
+        -:  116:    //Final bool check to see if testing passed or failed,  prints result to standard out
+        1:  117:    if (pass) {
+    #####:  118:        printf("->->  - TEST SUCCESSFULLY COMPLETED -  <-<-\n");
+    #####:  119:    } else{
+        1:  120:        printf("->->  - TEST FAILED -  <-<-\n");
+        -:  121:    }
+        -:  122:
+        1:  123:    return 0;
+        -:  124:};

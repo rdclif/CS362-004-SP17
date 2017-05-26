@@ -1,169 +1,142 @@
-/* -----------------------------------------------------------------------
- * Assignment 4
- * randomtestadventurer.c
- * Shreyans Khunteta
- 
- 
- I tried testing the adventurer card here but kept running into bugs that just messed up
- what I tried to do.
- 
- So I leave this here in honour of what I attempted.
- */
+//
+// Created by Robert Clifton on 4/18/17.
+//cardtest2  unit test for the adventurer card function.
+//
+//to make and test: make randomtestadventurer.out
+//
+//gcc dominion.c rngs.c randomtestadventurer.c -o randomtestadventurer
 
 #include "dominion.h"
 #include "dominion_helpers.h"
-#include "rngs.h"
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include <stdio.h>
 #include <assert.h>
+#include "rngs.h"
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+
+int main() {
+
+    int pass = 1;
+    char testCard[] = "adventurer";
+    struct gameState G, copyG;
+    //int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse, sea_hag, tribute, smithy};
+
+    int x = 1000;
+    int i, n, r, retVal;
+    int handPos = 0;
+    int choice1 = 0, choice2 = 0, choice3 = 0;
+    int bonus = 0;
+    int currentPlayer;
+    int addedCards = 2;
+    int money, copyMoney;
+    int totalCards, copytotalCards;
+
+    //initialize game state
+    //initializeGame(numbPlayers, k, randSeed, &G);
 
 
-int main () {
-/*
-   struct gameState g;
-
-   int seed = 1000;
-   int numTestsPassed = 0, passedAllTestsFlag = 0, testDraw = 0, failedDiscard = 0;
-   int numPlayers = 2, currPlayer = 0, deckSize, handSize, randCard, randAllowedCard;
-   int trCopper, trSilver, trGold;
-   int beforeCoins = 0, afterCoins = 0;
-   int i, j, k;
-   int choice1 = 0, choice2 = 0, choice3 = 0, handPos = 0, bonus = 0;
-
-   int allowedCards[10] = {adventurer, embargo, village, minion, mine, 
-   cutpurse, sea_hag, tribute, smithy, council_room};
-
-   srand(time(NULL));
+    //initialize random
+    srand(time(NULL));
 
 
-   for (i = 0; i < 123456; i++) {
+    printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n", testCard);
 
-      //Randomly intialize the game state. Then make sure the needed variables are sane.
-      initializeGame(numPlayers, allowedCards, seed, &g);
-      beforeCoins = 0;
-      afterCoins = 0;
+    printf ("----  -RANDOM TESTS- ----\n");
+    for (i = 0; i < x; i++){
+        for (n = 0; n < sizeof(struct gameState)/ sizeof(int); n++) {
+            ((int*)&G)[n] = rand() % 128;
+        }
 
-      deckSize = rand() % (MAX_DECK + 1);
-      handSize = rand() % (deckSize + 1);
-
-      g.deckCount[0] = deckSize - handSize;
-      g.handCount[0] = handSize;
-
-
-
-      //Fill up each player's deck with random cards
-      for (j = 0; j < numPlayers; j++) {
-
-	 for (k = 0; k < g.deckCount[j]; k++) {
-
-	    randCard = rand() % 51;	//# of diff cards possible + 1
-
-	    if (randCard == 1) {
-	       g.deck[j][k] = copper;
-	    }
-	    else if (randCard == 2) {
-	       g.deck[j][k] = silver;
-	    }
-	    else if (randCard == 3) {
-	       g.deck[j][k] = gold;
-	    }
-	    else {
-	       randAllowedCard = rand() % 10;
-	       g.deck[j][k] = allowedCards[randAllowedCard];
-	    }
-
-	 }
-
-      }
+        G.numPlayers = (rand() % 3)+2;
+        G.whoseTurn = rand() % G.numPlayers;
+        currentPlayer = whoseTurn(&G);
+        G.handCount[currentPlayer] = (rand() % (MAX_HAND/2))+1;
+        G.deckCount[currentPlayer] = (rand() % (MAX_DECK/2))+1;
+        G.discardCount[currentPlayer] = (rand() % (MAX_DECK/2))+1;
+        handPos = (rand() % G.handCount[currentPlayer]);
+        for (n = 0; n < G.handCount[currentPlayer]; n++) {
+            r = (rand() % 2);
+            if (r == 0) {
+                G.hand[currentPlayer][n] = copper;
+            } else {
+                G.hand[currentPlayer][n] = estate;
+            }
+        }
+        for (n = 0; n < G.deckCount[currentPlayer]; n++) {
+            r = (rand() % 2);
+            if (r == 0) {
+                G.deck[currentPlayer][n] = copper;
+            } else {
+                G.deck[currentPlayer][n] = estate;
+            }
+        }
 
 
-      //Note the current state of the player's treasure
-      for (j = 0; j < g.handCount[currPlayer]; j++) {
-	 if (g.hand[currPlayer][j] == copper || g.hand[currPlayer][j] == silver || g.hand[currPlayer][j] == gold) {
-	    beforeCoins += 1;
-	 }
-      }
+        memcpy(&copyG, &G, sizeof(struct gameState));
+
+        retVal = cardEffect(adventurer, choice1, choice2, choice3, &copyG, handPos, &bonus);
+        if (retVal != 0) {
+            printf("Return Fail");
+            pass = 0;
+        };
 
 
-      //Play the card
-      cardEffect(adventurer, choice1, choice2, choice3, &g, handPos, &bonus);
+        if (copyG.handCount[currentPlayer] != G.handCount[currentPlayer]+addedCards){
+            pass = 0;
+			//printf("NP:%d, WT:%d, HC:%d, DC:%d, %d, HP:%d\n", G.numPlayers, G.whoseTurn, G.handCount[currentPlayer], G.deckCount[currentPlayer], G.discardCount[currentPlayer], handPos);
+			//printf("NP:%d, WT:%d, HC:%d, DC:%d, %d, HP:%d\n", copyG.numPlayers, copyG.whoseTurn, copyG.handCount[currentPlayer], copyG.deckCount[currentPlayer], copyG.discardCount[currentPlayer], handPos);
+            printf("Hand Count: %d, Expected: %d \n\n", copyG.handCount[currentPlayer], G.handCount[currentPlayer]+addedCards);
+        }
+
+        totalCards = G.deckCount[currentPlayer] + G.discardCount[currentPlayer];
+        copytotalCards = copyG.deckCount[currentPlayer] + copyG.discardCount[currentPlayer];
+        if (copytotalCards != totalCards - addedCards) {
+            pass = 0;
+            printf("Total Cards: %d, Expected: %d \n\n", copytotalCards, totalCards-addedCards);
+        };
+
+        money = 0;
+        n = 0;
+        while (n < numHandCards(&G)) {
+            if (handCard(n, &G) == copper) {
+                money++;
+            } else if (handCard(n, &G) == silver) {
+                money += 2;
+            } else if (handCard(n, &G) == gold) {
+                money += 3;
+            }
+            n++;
+        }
+
+        copyMoney = 0;
+        n = 0;
+        while (n < numHandCards(&copyG)) {
+            if (handCard(n, &copyG) == copper) {
+                copyMoney++;
+            } else if (handCard(n, &copyG) == silver) {
+                copyMoney += 2;
+            } else if (handCard(n, &copyG) == gold) {
+                copyMoney += 3;
+            }
+            n++;
+        };
+        if (copyMoney < money+2) {
+            pass = 0;
+            printf("Money Count: %d, Expected Money Count: >= %d \n\n", copyMoney, money+2);
+        }
+        
+
+    }
 
 
-      //Note the state of the player's treasure now
-      for (j = 0; j < g.handCount[currPlayer]; j++) {
-	 if (g.hand[currPlayer][j] == copper || g.hand[currPlayer][j] == silver || g.hand[currPlayer][j] == gold) {
-	    afterCoins += 1;
-	 }
-      }
+    //Final bool check to see if testing passed or failed,  prints result to standard out
+    if (pass) {
+        printf("->->  - TEST SUCCESSFULLY COMPLETED -  <-<-\n");
+    } else{
+        printf("->->  - TEST FAILED -  <-<-\n");
+    }
 
-
-      trCopper = 0;
-      trSilver = 0;
-      trGold = 0;
-
-
-      //Note the discard pile state
-      for (j = 0; j < g.discardCount[currPlayer]; j++) {
-
-	 if (g.discard[currPlayer][j] == copper) {
-	    trCopper += 1;
-	 }
-	 else if (g.discard[currPlayer][j] == silver) {
-	    trSilver += 1;
-	 }
-	 else if (g.discard[currPlayer][j] == gold) {
-	    trGold += 1;
-	 }
-
-      }
-
-
-      //NOW... the moment of reckoning... the tests
-      passedAllTestsFlag = 1;
-
-      if (afterCoins != (beforeCoins + 2)) {
-	 testDraw++;
-	 passedAllTestsFlag = 0;
-      }
-      
-      if (afterCoins < beforeCoins) {
-	 testDraw++;
-	 passedAllTestsFlag = 0;
-      }
-
-
-      if (trGold != 0) {
-	 failedDiscard++;
-	 passedAllTestsFlag = 0;
-      }
-
-      if (trSilver != 0) {
-	 failedDiscard++;
-	 passedAllTestsFlag = 0;
-      }
-
-      if (trCopper != 0) {
-	 failedDiscard++;
-	 passedAllTestsFlag = 0;
-      }
-
-
-      if (passedAllTestsFlag == 1) {
-	 numTestsPassed++;
-      }
-
-   }
-
-   printf("Adventurer tests summary:\n");
-   printf("\tPASSED: %d\n", numTestsPassed);
-   printf("\tFAILED (draw): %d\n", testDraw);
-   printf("\tFAILED (discard): %d\n\n", failedDiscard);
-
-   
-*/
-   return 0;
-
-}
+    return 0;
+};

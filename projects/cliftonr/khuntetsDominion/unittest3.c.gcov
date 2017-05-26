@@ -1,0 +1,187 @@
+        -:    0:Source:unittest3.c
+        -:    0:Graph:unittest3.gcno
+        -:    0:Data:unittest3.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1://
+        -:    2:// Created by Robert Clifton on 4/18/17.
+        -:    3://unittest3  unit test for the updateCoins function.
+        -:    4://
+        -:    5://to make and test: make unittestresults.out
+        -:    6://
+        -:    7://gcc dominion.c rngs.c unittest3.c -o unittest3
+        -:    8:
+        -:    9:#include "dominion.h"
+        -:   10:#include "dominion_helpers.h"
+        -:   11:#include <string.h>
+        -:   12:#include <stdio.h>
+        -:   13:#include <assert.h>
+        -:   14:#include "rngs.h"
+        -:   15:#include <stdlib.h>
+        -:   16:
+        -:   17:int main() {
+        -:   18:
+        1:   19:    char testFunction[] = "updateCoins()";
+        -:   20:    struct gameState G, copyG;
+        1:   21:    int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
+        -:   22:                 sea_hag, tribute, smithy};
+        -:   23:
+        1:   24:    int pass = 1;
+        -:   25:    int i, retVal;
+        1:   26:    int x = 1000;
+        1:   27:    int randSeed = 2;
+        1:   28:    int numbPlayers = 2;
+        1:   29:    int bonus = 0;
+        1:   30:    int player = 0;
+        -:   31:
+        -:   32:    //initialize game state
+        1:   33:    initializeGame(numbPlayers, k, randSeed, &G);
+        -:   34:
+        1:   35:    printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n\n", testFunction);
+        -:   36:
+        -:   37:    //basic test of return value
+        1:   38:    printf("\n----  - TEST 1: Return Value -  ----\n\n");
+        1:   39:    memcpy(&copyG, &G, sizeof(struct gameState));
+        -:   40:
+     2002:   41:    for (i = 0; i < x; i++) {
+     1000:   42:        retVal = updateCoins(player, &copyG, bonus);
+     1000:   43:        if (retVal != 0) {
+    #####:   44:            printf("test 1 fail Return != 0\n");
+    #####:   45:            pass = 0;
+    #####:   46:        };
+     1000:   47:    }
+        -:   48:
+        1:   49:    printf("Return Value: %d, Expected: %d \n\n", retVal, 0);
+        -:   50:
+        -:   51:    //test and compare hand count in copied struct
+        1:   52:    printf("\n----  - TEST 2: Hand Count  -  ----\n\n");
+        1:   53:    memcpy(&copyG, &G, sizeof(struct gameState));
+        -:   54:
+     2002:   55:    for (i = 0; i < x; i++) {
+     1000:   56:        updateCoins(player, &copyG, bonus);
+     1000:   57:        if (copyG.handCount[player] != G.handCount[player]) {
+    #####:   58:            printf("test 2 hand count fail, Got: %d, Expected: %d\n", copyG.handCount[player], G.handCount[player]);
+    #####:   59:            pass = 0;
+    #####:   60:        };
+     1000:   61:    }
+        -:   62:
+        1:   63:    printf("Hand Count: %d, Expected: %d \n\n", copyG.handCount[player], G.handCount[player]);
+        -:   64:
+        -:   65:    //test count with copper coin cards
+        1:   66:    printf("\n----  - TEST 3:Copper Coin Count -  ----\n\n");
+        1:   67:    memcpy(&copyG, &G, sizeof(struct gameState));
+        1:   68:    int z = copyG.handCount[player];
+        -:   69:    int j;
+        1:   70:    int coinValue = 1;
+        1:   71:    int expectedCoinCount = z *coinValue;
+        -:   72:
+        -:   73:
+        -:   74:
+     2002:   75:    for (i = 0; i < x; i++) {
+        -:   76:        //fill hand with copper coins
+    12000:   77:        for (j = 0; j < z; j++) {
+     5000:   78:            copyG.hand[player][j] = copper;
+     5000:   79:        }
+     1000:   80:        updateCoins(player, &copyG, bonus);
+     1000:   81:        if (copyG.coins != expectedCoinCount) {
+    #####:   82:            printf("test 3 coin count fail, Got: %d, Expected: %d\n", copyG.coins, expectedCoinCount);
+    #####:   83:            pass = 0;
+    #####:   84:        }
+     1000:   85:    }
+        1:   86:    printf("Coins: %d, Expected: %d \n\n", copyG.coins, expectedCoinCount);
+        -:   87:
+        -:   88:    //test count with silver coin cards
+        1:   89:    printf("\n----  - TEST 4:Silver Coin Count -  ----\n\n");
+        1:   90:    memcpy(&copyG, &G, sizeof(struct gameState));
+        1:   91:    z = copyG.handCount[player];
+        1:   92:    coinValue = 2;
+        1:   93:    expectedCoinCount = z *coinValue;
+        -:   94:
+        -:   95:
+        -:   96:
+     2002:   97:    for (i = 0; i < x; i++) {
+        -:   98:        //fill hand with silver coins
+    12000:   99:        for (j = 0; j < z; j++) {
+     5000:  100:            copyG.hand[player][j] = silver;
+     5000:  101:        }
+     1000:  102:        updateCoins(player, &copyG, bonus);
+     1000:  103:        if (copyG.coins != expectedCoinCount) {
+    #####:  104:            printf("test 4 coin count fail, Got: %d, Expected: %d\n", copyG.coins, expectedCoinCount);
+    #####:  105:            pass = 0;
+    #####:  106:        }
+     1000:  107:    }
+        1:  108:    printf("Coins: %d, Expected: %d \n\n", copyG.coins, expectedCoinCount);
+        -:  109:
+        -:  110:    //test count with gold coin cards
+        1:  111:    printf("\n----  - TEST 5:Gold Coin Count -  ----\n\n");
+        1:  112:    memcpy(&copyG, &G, sizeof(struct gameState));
+        1:  113:    z = copyG.handCount[player];
+        1:  114:    coinValue = 3;
+        1:  115:    expectedCoinCount = z *coinValue;
+        -:  116:
+        -:  117:
+        -:  118:
+     2002:  119:    for (i = 0; i < x; i++) {
+        -:  120:        //fill hand with gold coins
+    12000:  121:        for (j = 0; j < z; j++) {
+     5000:  122:            copyG.hand[player][j] = gold;
+     5000:  123:        }
+     1000:  124:        updateCoins(player, &copyG, bonus);
+     1000:  125:        if (copyG.coins != expectedCoinCount) {
+    #####:  126:            printf("test 5 coin count fail, Got: %d, Expected: %d\n", copyG.coins, expectedCoinCount);
+    #####:  127:            pass = 0;
+    #####:  128:        }
+     1000:  129:    }
+        1:  130:    printf("Coins: %d, Expected: %d \n\n", copyG.coins, expectedCoinCount);
+        -:  131:
+        -:  132:    //test count with mixed cards
+        1:  133:    printf("\n----  - TEST 6:Mixed Coin Count -  ----\n\n");
+        1:  134:    memcpy(&copyG, &G, sizeof(struct gameState));
+        1:  135:    copyG.handCount[player] = 5;
+        1:  136:    expectedCoinCount = 9;
+        -:  137:
+        -:  138:
+        -:  139:
+     2002:  140:    for (i = 0; i < x; i++) {
+        -:  141:        //fill hand with coin cards
+     1000:  142:        copyG.hand[player][0] = copper;
+     1000:  143:        copyG.hand[player][1] = copper;
+     1000:  144:        copyG.hand[player][2] = silver;
+     1000:  145:        copyG.hand[player][3] = silver;
+     1000:  146:        copyG.hand[player][4] = gold;
+        -:  147:
+     1000:  148:        updateCoins(player, &copyG, bonus);
+     1000:  149:        if (copyG.coins != expectedCoinCount) {
+    #####:  150:            printf("test 6 coin count fail, Got: %d, Expected: %d\n", copyG.coins, expectedCoinCount);
+    #####:  151:            pass = 0;
+    #####:  152:        }
+     1000:  153:    }
+        1:  154:    printf("Coins: %d, Expected: %d \n\n", copyG.coins, expectedCoinCount);
+        -:  155:
+        -:  156:    //test addition of bonus
+        1:  157:    printf("\n----  - TEST 7: Bonus -  ----\n\n");
+        1:  158:    memcpy(&copyG, &G, sizeof(struct gameState));
+        1:  159:    copyG.handCount[player] = 0;
+        1:  160:    bonus = 1;
+        1:  161:    expectedCoinCount = 1;
+        -:  162:
+        -:  163:
+     2002:  164:    for (i = 0; i < x; i++) {
+        -:  165:        //fill hand with coins
+        -:  166:
+     1000:  167:        updateCoins(player, &copyG, bonus);
+     1000:  168:        if (copyG.coins != expectedCoinCount) {
+    #####:  169:            printf("test 7 coin count fail, Got: %d, Expected: %d\n", copyG.coins, expectedCoinCount);
+    #####:  170:            pass = 0;
+    #####:  171:        }
+     1000:  172:    }
+        1:  173:    printf("Coins: %d, Expected: %d \n\n", copyG.coins, expectedCoinCount);
+        -:  174:
+        -:  175:    //Final bool check to see if testing passed or failed,  prints result to standard out
+        1:  176:    if (pass) {
+        1:  177:        printf("->->  - TEST SUCCESSFULLY COMPLETED -  <-<-\n");
+        1:  178:    } else{
+    #####:  179:        printf("->->  - TEST FAILED -  <-<-\n");
+        -:  180:    }
+        1:  181:    return 0;
+        -:  182:};

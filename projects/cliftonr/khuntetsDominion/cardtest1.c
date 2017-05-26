@@ -1,92 +1,78 @@
+//
+// Created by Robert Clifton on 4/18/17.
+//cardtest1  unit test for the smity card function.
+//
+//to make and test: make unittestresults.out
+//
+//gcc dominion.c rngs.c cardtest1.c -o cardtest1
 
 #include "dominion.h"
 #include "dominion_helpers.h"
-#include "rngs.h"
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
-
-// returns 0 for a successful return
-
-void assertEqual(int before, int after, int testNum)
-{
-	if(before == after)
-	{
-		printf("\n----------------- Test #%d: Passed -----------------\n", testNum);
-	}
-	else{
-		printf("\n----------------- Test #%d: Failed -----------------\n", testNum);
-	}
-}
+#include "rngs.h"
+#include <stdlib.h>
 
 int main() {
 
+    int pass = 1;
+    char testCard[] = "smithy";
+    struct gameState G, copyG;
+    int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
+                 sea_hag, tribute, smithy};
+    int x = 1000;
+    int i, retVal;
+    int numbPlayers = 2;
+    int randSeed = 2;
+    int handPos = 0;
+    int choice1 = 0, choice2 = 0, choice3 = 0;
+    int bonus = 0;
 
-	printf("Working on it.");
-   /* printf("\n####################\n");
-    printf("Card test (unit test) - Adventurer\n");
 
-    // set function parameters
-    int i, p, z, cardDrawn;
-    int seed = 999;
-    int numPlayer = 2;
-    struct gameState G;
-    int drawntreasure = 0;
-    int tempHand[MAX_HAND];
-    int k[10] = {adventurer, council_room, feast, gardens, mine, remodel, smithy, village, baron, great_hall};
-    int handCount = 5;
-    int deckCount = 3;
-    int silvers[MAX_HAND];
-    int estates[MAX_HAND];
-    int adventurers[MAX_HAND];
-    for (i = 0; i < MAX_HAND; i++) {
-        silvers[i] = silver;
-        estates[i] = estate;
-        adventurers[i] = adventurer;
+    //initialize game state
+    initializeGame(numbPlayers, k, randSeed, &G);
+
+
+    printf("\n->->->    - TESTING CARD: %s -    <-<-<-\n\n", testCard);
+
+    //basic test of return value
+    printf("\n----  - TEST 1: Function Return  -  ----\n\n");
+
+    for (i = 0; i < x; i++) {
+        memcpy(&copyG, &G, sizeof(struct gameState));
+        retVal = cardEffect(smithy, choice1, choice2, choice3, &copyG, handPos, &bonus);
+        if (retVal != 0) {
+            pass = 0;
+            break;
+        };
+    };
+    printf("Return Value: %d, Expected: %d \n\n", retVal, 0);
+
+    //test and compare hand count on copied struct
+    printf("\n----  - TEST 2: Hand Count  -  ----\n\n");
+
+    int addedCards = 3;
+    int discard = 1;
+    int currentPlayer = whoseTurn(&G);
+
+    for (i = 0; i < x; i++) {
+        memcpy(&copyG, &G, sizeof(struct gameState));
+        cardEffect(smithy, choice1, choice2, choice3, &copyG, handPos, &bonus);
+        if (copyG.handCount[currentPlayer] != G.handCount[currentPlayer]+addedCards-discard){
+            pass = 0;
+            break;
+        }
     }
 
-    for (p = 0; p < numPlayer; p++) {
-        printf("\n--- Testing player %d\n", p);
+    printf("Hand Count: %d, Expected: %d \n\n", copyG.handCount[currentPlayer], G.handCount[currentPlayer]+addedCards-discard);
 
-        // clear gameState, set the hand
-        memset(&G, 23, sizeof(struct gameState));
-        initializeGame(numPlayer, k, seed, &G);
-        G.handCount[p] = handCount;
-        memcpy(G.hand[p], adventurers, sizeof(int) * handCount);    // all cards in hand are adventurers, can be counted later
-        G.deckCount[p] = deckCount;
-        memcpy(G.deck[p], estates, sizeof(int));          // this estate will be drawn but should not remain in hand
-        for (i = 1; i < 3; i++)
-            memcpy(G.deck[p], silvers, sizeof(int));      // the cards we are looking for in hand will be silvers
-
-	printf("-- Testing successful return\n");
-        assert(playAdventurer(&G, p, drawntreasure, tempHand, z, cardDrawn) == 0);
-        printf("adventurerEffect(): PASS successful return\n");
-
-	printf("These cards are in hand:\n");
-        int count = 0;
-        for (i = 0; i < G.handCount[p]; i++) {
-	    printf("%d\n", G.hand[p][i]);
-            if (G.hand[p][i] == adventurer)
-                count++;
-        }
-        if (count == 4)
-            printf("playAdventurer(): PASS adventurer discarded from hand\n");
-        else
-            printf("playadventurer(): FAIL adventurer card is still in hand\n");
-
-        count = 0;
-        for (i = 0; i < G.handCount[p]; i++) {
-            if (G.hand[p][i] == silver)
-                count++;
-        }
-        if (count == 2)
-            printf("playAdventurer(): PASS 2 silvers found in hand\n");
-        else
-            printf("playAdventurer(): FAIL expected 2 silvers in hand, found %d\n", count);
+    //Final bool check to see if testing passed or failed,  prints result to standard out
+    if (pass) {
+        printf("->->  - TEST SUCCESSFULLY COMPLETED -  <-<-\n");
+    } else{
+        printf("->->  - TEST FAILED -  <-<-\n");
     }
-    
-	printf("\n >>>>> SUCCESS: Testing complete %s <<<<<\n\n", TESTCARD);
-*/
+
     return 0;
-}
-
+};
