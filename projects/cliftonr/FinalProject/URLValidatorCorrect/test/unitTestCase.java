@@ -1,14 +1,11 @@
 
-
+import junit.framework.TestCase;
 import java.util.Random;
 
-import junit.framework.TestCase;
 
-
-
-public class UrlValidatorTest extends TestCase {
-
-   public UrlValidatorTest(String testName) {
+public class unitTestCase extends TestCase {
+	
+	public unitTestCase(String testName) {
 		super(testName);
 	}
 	
@@ -64,10 +61,9 @@ public class UrlValidatorTest extends TestCase {
 
 	//unit tests 
 	public void testURLValid() {
-		UrlValidator urlVal = new UrlValidator();
 		
-		System.out.print("\n\n-----  STARTING UNIT TEST CASES  -----\n\n");
-		System.out.print("-- TESTING FUNCTION isValid()  --\n\n");
+		UrlValidator urlVal = new UrlValidator();
+		System.out.print("--  TESTING FUNCTION isValid()  --\n\n");
 		
 		
 		
@@ -286,188 +282,10 @@ public class UrlValidatorTest extends TestCase {
 		}
 	}
 	
-	
-   public void testManualURL() {
-	   System.out.print("\n\n-----  STARTING MANUAL TESTING  -----\n\n");
-	   UrlValidator urlVal = new UrlValidator();
-	   System.out.print("\n\nMANUAL TESTING VALID URLS\n\n");
-	   /*
-	    * last url used in this array is a valid url used in the correct urlvalidator from Part-A
-	    * */
-	   String validURL[] = {"https://www.google.com", "ftp://www.google.com", "http://www.reddit.com", 
-			  "http://www.twitch.tv", "https://www.wikipedia.org", "http://google.com", "http://reddit.org",
-			   "http://washington.gov", "ftp://www.google.com/somepath", "ftp://www.wikipedia.org/wiki/train",
-			   "https://www.awebsite.org/apath/$99", "http://awebsite.gov:500", "http://255.255.255.255",
-			   "ftp://website.org/path", "http://255.255.255.255:65636?action=edit&mode=up"};
-	   boolean result;
-	   for(int i = 0; i < validURL.length; i++){
-		   String value = validURL[i].toString();
-		   result = urlVal.isValid(value);
-		   if(result){
-			   System.out.print("VALID URL " + validURL[i] + " PASSED AS VALID\n");
-			   }
-		   else{
-			   System.out.print("VALID URL " + validURL[i] + " FAILED\n");
-			   }
-		   }
-	   System.out.print("\n\nMANUAL TESTING INVALID URLS\n\n");
-	   String invalidURL[] = {"htps://www.google.com", "ftp:/www.google.com", "http://wwwww.reddit.com", 
-			  "httpwww.twitch.gov", "https:///www.wikipedia.org", "http:://google.com", "http://redditorg",
-			   "http://washington..gov", "fttp://www.google.com/somepath", "ftp://www.wikipedia.orgwiki/train",
-			   "https//www.awebsite.org/apath/topath", "http://awebsite.gov500..", "http://255.255.255.255&&",
-			   "ftp://website.org?path", "11://www.22.com/33", "h ttp://www.website.org", "http://website.org:t0",
-			   "http://google.com::0", "ftp://google.google.com"};
-	   for(int i = 0; i < invalidURL.length; i++){
-		   String value = invalidURL[i].toString();
-		   result = urlVal.isValid(value);
-		   if(result){
-			   System.out.print("INVALID URL " + invalidURL[i] + " PASSED AS VALID\n");
-			   }
-		   else{
-			   System.out.print("INVALID URL " + invalidURL[i] + " FAILED\n");
-			   }
-		   }
-   }
-   
-   public void testInputPartition(){
-	   System.out.print("\n\n-----  STARTING INPUT PARITION TESTING  -----\n\n");
-	   UrlValidator urlVal = new UrlValidator(null, null, UrlValidator.ALLOW_ALL_SCHEMES);
-	   boolean result;
-	   
-	   System.out.print("\nTESTING AUTHORITY INPUT PARTITION\n\n");
-	   System.out.print("TESTING VALID AUTHORITY\n");
-	   String vAuthority[] = {"http://256.256.256.256", "http://www.google.com", "http://255.255.255.255"};
-	   for(int i = 0; i < vAuthority.length; i++){
-			  String value = vAuthority[i].toString();
-			  result = urlVal.isValid(value);
-			  if(result){
-				  System.out.print("VALID AUTHORITY " + vAuthority[i] + " PASSED AS VALID\n");
-			  }
-			  else{
-				  System.out.print("VALID AUTHORITY " + vAuthority[i] + " FAILED\n");
-			  }
-		  }
-	   System.out.print("\nTESTING INVALID AUTHORITY\n");
-	   String iAuthority[] = {"http://website.zmb", "http://www.google.zmb.zmb", "http://0.0.0.0", "http://.xyz"};
-	   for(int i = 0; i < iAuthority.length; i++){
-			  String value = iAuthority[i].toString();
-			  result = urlVal.isValid(value);
-			  if(result){
-				  System.out.print("INVALID AUTHORITY " + iAuthority[i] + " PASSED AS VALID\n");
-			  }
-			  else{
-				  System.out.print("INVALID AUTHORITY " + iAuthority[i] + " FAILED\n");
-			  }
-		  }
-	   
-	   
-	   System.out.print("\nTESTING PORT INPUT PARTITION\n\n");
-	   System.out.print("TESTING VALID PORT\n");
-	   String vPort[] = {"http://www.google.com:12345", "http://www.google.com:88", "http://www.google.com:666",
-			   "http://www.google.com:0"};
-	   for(int i = 0; i < vPort.length; i++){
-			  String value = vPort[i].toString();
-			  result = urlVal.isValid(value);
-			  if(result){
-				  System.out.print("VALID PORT " + vPort[i] + " PASSED AS VALID\n");
-			  }
-			  else{
-				  System.out.print("VALID PORT " + vPort[i] + " FAILED\n");
-			  }
-		  }
-	   System.out.print("\nTESTING INVALID PORT\n");
-	   String iPort[] = {"http://www.google.com:-8", "http://www.google.com:-88", "http://www.google.com:66d",
-	   "http://www.google.com:x0"};
-	   for(int i = 0; i < iPort.length; i++){
-			  String value = iPort[i].toString();
-			  result = urlVal.isValid(value);
-			  if(result){
-				  System.out.print("INVALID PORT " + iPort[i] + " PASSED AS VALID\n");
-			  }
-			  else{
-				  System.out.print("INVALID PORT " + iPort[i] + " FAILED\n");
-			  }
-		  }
-	   
-	   UrlValidator urlValid = new UrlValidator();//do not want to allow all schemes here
-	   System.out.print("\nTESTING SCHEME INPUT PARTITION\n\n");
-	   System.out.print("TESTING VALID SCHEME\n");
-	   String vScheme[] = {"https://www.google.com", "http://www.google.com", "ftp://www.google.com"};
-	   for(int i = 0; i < vScheme.length; i++){
-			  String value = vScheme[i].toString();
-			  result = urlValid.isValid(value);
-			  if(result){
-				  System.out.print("VALID SCHEME " + vScheme[i] + " PASSED AS VALID\n");
-			  }
-			  else{
-				  System.out.print("VALID SCHEME " + vScheme[i] + " FAILED\n");
-			  }
-		  }
-	   System.out.print("\nTESTING INVALID SCHEME\n");
-	   String iScheme[] = {"htp://www.google.com", "ftps://www.google.com:", "://www.google.com",
-	   "httpss://www.google.com:"};
-	   for(int i = 0; i < iScheme.length; i++){
-			  String value = iScheme[i].toString();
-			  result = urlValid.isValid(value);
-			  if(result){
-				  System.out.print("INVALID SCHEME " + iScheme[i] + " PASSED AS VALID\n");
-			  }
-			  else{
-				  System.out.print("INVALID SCHEME " + iScheme[i] + " FAILED\n");
-			  }
-		  }
-	   
-	   
-	   System.out.print("\nTESTING PATH INPUT PARTITION\n\n");
-	   System.out.print("TESTING VALID PATH\n");
-	   String vPath[] = {"http://www.google.com/index", "http://www.google.com/index/foo", "http://www.google.com/",
-	   "http://www.google.com/."};
-	   for(int i = 0; i < vPath.length; i++){
-			  String value = vPath[i].toString();
-			  result = urlVal.isValid(value);
-			  if(result){
-				  System.out.print("VALID PATH " + vPath[i] + " PASSED AS VALID\n");
-			  }
-			  else{
-				  System.out.print("VALID PATH " + vPath[i] + " FAILED\n");
-			  }
-		  }
-	   System.out.print("\nTESTING INVALID PATH\n");
-	   String iPath[] = {"http://www.google.com/..", "http://www.google.com/...", "http://www.google.com//."};
-	   for(int i = 0; i < iPath.length; i++){
-			  String value = iPath[i].toString();
-			  result = urlVal.isValid(value);
-			  if(result){
-				  System.out.print("INVALID PATH " + iPath[i] + " PASSED AS VALID\n");
-			  }
-			  else{
-				  System.out.print("INVALID PATH " + iPath[i] + " FAILED\n");
-			  }
-		  }
-   }
-   
-   public void testString() {
-	   UrlValidator urlVal = new UrlValidator();
-	   String test = "http://www.go.com:8000";
-	   urlVal.isValid(test);
-   }
-   
-   
-	
 	//main function - calls testURLValid(); 
-	public static void main(String[] argv) {
-		UrlValidatorTest unitTest = new UrlValidatorTest("Unit Test");
-		//call manual tests
-		//unitTest.testManualURL();
-		
-		//call input partition tests
-		//unitTest.testInputPartition();
-		
-		//call unit testing
-		//unitTest.testURLValid();
-		
-		unitTest.testString();
-	}
+	 public static void main(String[] argv) {
+		 unitTestCase unitTest = new unitTestCase("Unit Test");
+		 unitTest.testURLValid();
+	 }
+
 }
-
-
